@@ -69,8 +69,6 @@ const Game = () => {
         return cols * cellWidth;
     }
 
-    
-
     // Clicking a div should toggle the cell between alive and dead
     const handleCellClick = (i: number, k: number) => {
         const tempGrid = produce(grid, gridCopy => {
@@ -144,7 +142,7 @@ const Game = () => {
                     onClick={() => {
                         setIsRunning(!isRunning);
                     }}
-                >{isRunning ? "Running" : "Start"}</button>
+                >{isRunning ? "Stop" : "Start"}</button>
                 <button
                     style={{
                         border: "1px solid white",
@@ -152,7 +150,7 @@ const Game = () => {
                         borderRadius: "5px",
                         margin: "10px auto" 
                     }}
-                    // onClick={() => clearGrid()}
+                    onClick={() => clearGrid()}
                 >Clear</button>
             </div>
             
