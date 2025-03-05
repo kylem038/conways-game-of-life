@@ -8,7 +8,7 @@ type GridProps = {
 };
 
 type GridState = {
-    grid: [[number]];
+    grid: number[][];
 };
 
 const Grid: React.FC<GridProps> = ({ rows, cols, isRunning }) => {
@@ -20,6 +20,21 @@ const Grid: React.FC<GridProps> = ({ rows, cols, isRunning }) => {
 
     const cellHeight = 40;
     const cellWidth = 40;
+
+    // List of neighbors to scan during simulation
+    const neighbors: number[][] = [
+        // Left and right of center
+        [0, 1],
+        [0, -1],
+        // The row below center
+        [1, 0],
+        [1, 1],
+        [1, -1],
+        // The row above center
+        [-1, 0],
+        [-1, 1],
+        [-1, -1]
+    ];
 
     // Initialize grid
     useEffect(() => {
@@ -66,11 +81,43 @@ const Grid: React.FC<GridProps> = ({ rows, cols, isRunning }) => {
         if(!isRunningRef.current) {
             return;
         } else {
-            // Rules of the game of life:
-            // 1. Any live cell with < 2 living neighbors dies
-            // 2. Any live cell with 2 || 3 live neighbors lives on
-            // 3. Any live cell with > 3 live neighbors dies (overpopulation)
-            // 4. Any dead cell with 3 live neighbors is now alive (repopulation)
+            const tempGrid = produce(grid, gridCopy => {
+                if(!gridCopy || !grid) {
+                    console.log('No grid or grid copy found');
+                    return;
+                }
+
+                // Rules of the game of life:
+                // 1. Any live cell with < 2 living neighbors dies
+                // 2. Any live cell with 2 || 3 live neighbors lives on
+                // 3. Any live cell with > 3 live neighbors dies (overpopulation)
+                // 4. Any dead cell with 3 live neighbors is now alive (repopulation)
+                for(let i = 0; i < rows; i++) {
+                    for(let j = 0; j < cols; j++) {
+                        let liveNeighbors = 0;
+                        neighbors.forEach(([x, y]) => {
+                            // Get neighbor by row
+                            const newRow = i + x;
+                            // Get neighbor by col
+                            const newCol = j + y;
+                            if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+                                liveNeighbors += grid[newRow][newCol];
+                            }
+                        });
+                        // 1. Any live cell with < 2 living neighbors dies
+                        // 3. Any live cell with > 3 live neighbors dies (overpopulation)
+                        if (liveNeighbors < 2 || liveNeighbors > 3) {
+                            gridCopy[i][j] = 0;
+                        // 4. Any dead cell with 3 live neighbors is now alive (repopulation)
+                        } else if (grid[i][j] === 0 && liveNeighbors === 3) {
+                            gridCopy[i][j] = 1;
+                        }
+                        // Rule 2 keeps the base state of the current cell
+                    }
+                }
+            });
+
+            setGrid(tempGrid);
            
             setTimeout(simulate, 1000);
         }
