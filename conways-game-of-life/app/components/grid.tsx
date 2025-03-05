@@ -34,6 +34,10 @@ const Grid: React.FC<GridProps> = ({ rows, cols }) => {
         }
         return grid;
     }
+
+    const handleCellClick = () => {
+        
+    }
     
     return (
         <div 
@@ -45,6 +49,7 @@ const Grid: React.FC<GridProps> = ({ rows, cols }) => {
                     return row.map((col: [number], k: number) => (
                         <div 
                             key={`${i}-${k}`}
+                            onClick={}
                             className={`h-10 w-10 ${grid[i][k] ? "bg-green-100" : ""} border`}
                             style={{
                                 height: cellHeight,
