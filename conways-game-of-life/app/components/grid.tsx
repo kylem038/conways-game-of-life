@@ -81,47 +81,43 @@ const Grid: React.FC<GridProps> = ({ rows, cols, isRunning }) => {
         if(!isRunningRef.current) {
             return;
         } else {
-            const tempGrid = produce(grid, gridCopy => {
-                if(!gridCopy || !grid) {
-                    console.log('No grid or grid copy found');
-                    return;
-                }
-
-                // Rules of the game of life:
-                // 1. Any live cell with < 2 living neighbors dies
-                // 2. Any live cell with 2 || 3 live neighbors lives on
-                // 3. Any live cell with > 3 live neighbors dies (overpopulation)
-                // 4. Any dead cell with 3 live neighbors is now alive (repopulation)
-                for(let i = 0; i < rows; i++) {
-                    for(let j = 0; j < cols; j++) {
-                        let liveNeighbors = 0;
-                        neighbors.forEach(([x, y]) => {
-                            // Get neighbor by row
-                            const newRow = i + x;
-                            // Get neighbor by col
-                            const newCol = j + y;
-                            if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
-                                liveNeighbors += grid[newRow][newCol];
+            console.log('inside simulation');
+            // G is the current grid
+            setGrid(g => {
+                return produce(g, gridCopy => {
+                    // Rules of the game of life:
+                    // 1. Any live cell with < 2 living neighbors dies
+                    // 2. Any live cell with 2 || 3 live neighbors lives on
+                    // 3. Any live cell with > 3 live neighbors dies (overpopulation)
+                    // 4. Any dead cell with 3 live neighbors is now alive (repopulation)
+                    for(let i = 0; i < rows; i++) {
+                        for(let j = 0; j < cols; j++) {
+                            let liveNeighbors = 0;
+                            neighbors.forEach(([x, y]) => {
+                                // Get neighbor by row
+                                const newRow = i + x;
+                                // Get neighbor by col
+                                const newCol = j + y;
+                                if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
+                                    liveNeighbors += g[newRow][newCol];
+                                }
+                            });
+                            // 1. Any live cell with < 2 living neighbors dies
+                            // 3. Any live cell with > 3 live neighbors dies (overpopulation)
+                            if (liveNeighbors < 2 || liveNeighbors > 3) {
+                                gridCopy[i][j] = 0;
+                            // 4. Any dead cell with 3 live neighbors is now alive (repopulation)
+                            } else if (g[i][j] === 0 && liveNeighbors === 3) {
+                                gridCopy[i][j] = 1;
                             }
-                        });
-                        // 1. Any live cell with < 2 living neighbors dies
-                        // 3. Any live cell with > 3 live neighbors dies (overpopulation)
-                        if (liveNeighbors < 2 || liveNeighbors > 3) {
-                            gridCopy[i][j] = 0;
-                        // 4. Any dead cell with 3 live neighbors is now alive (repopulation)
-                        } else if (grid[i][j] === 0 && liveNeighbors === 3) {
-                            gridCopy[i][j] = 1;
+                            // Rule 2 keeps the base state of the current cell
                         }
-                        // Rule 2 keeps the base state of the current cell
                     }
-                }
-            });
-
-            setGrid(tempGrid);
-           
+                })
+            })
+            
             setTimeout(simulate, 1000);
         }
-
     }, []);
     
     return (
@@ -130,12 +126,12 @@ const Grid: React.FC<GridProps> = ({ rows, cols, isRunning }) => {
             style={{maxWidth: calculateGridWidth()}}
         >
             {grid && 
-                grid.map((row: [[number]], i: number) => {
-                    return row.map((col: [number], k: number) => (
+                grid.map((row: number[], i: number) => {
+                    return row.map((col: number, j: number) => (
                         <div 
-                            key={`${i}-${k}`}
-                            onClick={() => handleCellClick(i, k)}
-                            className={`h-10 w-10 ${grid[i][k] ? "bg-green-100" : ""} border`}
+                            key={`${i}-${j}`}
+                            onClick={() => handleCellClick(i, j)}
+                            className={`h-10 w-10 ${grid[i][j] ? "bg-green-100" : ""} border`}
                             style={{
                                 height: cellHeight,
                                 width: cellWidth
