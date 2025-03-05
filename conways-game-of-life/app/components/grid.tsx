@@ -12,9 +12,16 @@ type GridState = {
 const Grid: React.FC<GridProps> = ({ rows, cols }) => {
     const [grid, setGrid] = useState<GridState>();
 
+    const cellHeight = 40;
+    const cellWidth = 40;
+
     useEffect(() => {
         setGrid(createGrid());
     }, []);
+
+    const calculateGridWidth = () => {
+        return cols * cellWidth;
+    }
 
     const createGrid = () => {
         const grid = [];
@@ -29,11 +36,21 @@ const Grid: React.FC<GridProps> = ({ rows, cols }) => {
     }
     
     return (
-        <div className="mt-6 flex flex-wrap">
+        <div 
+            className={`mt-6 flex flex-wrap`}
+            style={{maxWidth: calculateGridWidth()}}
+        >
             {grid && 
                 grid.map((row: [[number]], i: number) => {
                     return row.map((col: [number], k: number) => (
-                        <div key={`${i}-${k}`} className={`h-10 w-10 ${grid[i][k] ? "bg-green-100" : ""} border`}>
+                        <div 
+                            key={`${i}-${k}`}
+                            className={`h-10 w-10 ${grid[i][k] ? "bg-green-100" : ""} border`}
+                            style={{
+                                height: cellHeight,
+                                width: cellWidth
+                            }}
+                        >
                         </div>
                     ))
                 })
