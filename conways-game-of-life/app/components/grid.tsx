@@ -1,4 +1,5 @@
 import React, {useEffect, useState} from "react";
+import { produce } from "immer";
 
 type GridProps = {
     rows: number;
@@ -15,14 +16,17 @@ const Grid: React.FC<GridProps> = ({ rows, cols }) => {
     const cellHeight = 40;
     const cellWidth = 40;
 
+    // Initialize grid
     useEffect(() => {
         setGrid(createGrid());
     }, []);
 
+    // Calc grid width to be used within CSS
     const calculateGridWidth = () => {
         return cols * cellWidth;
     }
 
+    // Create grid dimensions based on props being passed in
     const createGrid = () => {
         const grid = [];
         for (let i = 0; i < rows; i++) {
@@ -35,8 +39,14 @@ const Grid: React.FC<GridProps> = ({ rows, cols }) => {
         return grid;
     }
 
-    const handleCellClick = () => {
-        
+    // Clicking a div should toggle the cell between alive and dead
+    const handleCellClick = (i: number, k: number) => {
+        const tempGrid = produce(grid, gridCopy => {
+            if(gridCopy) {
+                gridCopy[i][k] = grid[i][k] ? 0 : 1;
+            }
+        })
+        setGrid(tempGrid);
     }
     
     return (
@@ -49,7 +59,7 @@ const Grid: React.FC<GridProps> = ({ rows, cols }) => {
                     return row.map((col: [number], k: number) => (
                         <div 
                             key={`${i}-${k}`}
-                            onClick={}
+                            onClick={() => handleCellClick(i, k)}
                             className={`h-10 w-10 ${grid[i][k] ? "bg-green-100" : ""} border`}
                             style={{
                                 height: cellHeight,
