@@ -1,7 +1,7 @@
 import { GridState } from '../components/game';
 
 type GridProps = {
-    grid: GridState;
+    grid: number[][] | undefined;
     handleCellClick: (i: number, k:number) => void;
     gridWidth: number;
     cellHeight: number;

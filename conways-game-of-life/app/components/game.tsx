@@ -12,7 +12,7 @@ const Game = () => {
     const rows = 10;
     const cols = 10;
 
-    const [grid, setGrid] = useState<GridState>();
+    const [grid, setGrid] = useState<number[][]>();
     const [isRunning, setIsRunning] = useState(false);
 
      // Because simulate is memoized we need to reflect the value of isRunning
@@ -55,8 +55,6 @@ const Game = () => {
         [-1, -1]
     ];
 
-    
-
     // Trigger grid updates based on isRunning from the Game component
     useEffect(() => {
         if (isRunning) {
@@ -72,7 +70,7 @@ const Game = () => {
     // Clicking a div should toggle the cell between alive and dead
     const handleCellClick = (i: number, k: number) => {
         const tempGrid = produce(grid, gridCopy => {
-            if(gridCopy) {
+            if(gridCopy && grid) {
                 gridCopy[i][k] = grid[i][k] ? 0 : 1;
             }
         })
@@ -92,6 +90,14 @@ const Game = () => {
             // Interesting that taking the same approach as handleCellClick doesn't work, but returning directly inside setGrid does
             setGrid(g => {
                 return produce(g, gridCopy => {
+                    if(!gridCopy){
+                        console.error('Missing gridCopy during simulation');
+                        return;
+                    }
+                    if(!g) {
+                        console.error('Missing grid g during simulation');
+                        return;
+                    }
                     // Rules of the game of life:
                     // 1. Any live cell with < 2 living neighbors dies
                     // 2. Any live cell with 2 || 3 live neighbors lives on
