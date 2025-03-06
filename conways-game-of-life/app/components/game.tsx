@@ -4,10 +4,6 @@ import React, {useRef, useState, useEffect, useCallback} from 'react';
 import { produce } from "immer";
 import Grid from './grid';
 
-export type GridState = {
-    grid: number[][];
-};
-
 const Game = () => {
     const rows = 10;
     const cols = 10;
@@ -24,7 +20,7 @@ const Game = () => {
         setGrid(createGrid());
     }, []);
 
-    // Create grid dimensions based on props being passed in
+    // Create grid dimensions based on rows && cols
     const createGrid = () => {
         const grid = [];
         for (let i = 0; i < rows; i++) {
@@ -55,7 +51,7 @@ const Game = () => {
         [-1, -1]
     ];
 
-    // Trigger grid updates based on isRunning from the Game component
+    // Trigger grid updates based on isRunning
     useEffect(() => {
         if (isRunning) {
             simulate();
@@ -111,6 +107,7 @@ const Game = () => {
                                 const newRow = i + x;
                                 // Get neighbor by col
                                 const newCol = j + y;
+                                // Check bounds
                                 if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
                                     liveNeighbors += g[newRow][newCol];
                                 }

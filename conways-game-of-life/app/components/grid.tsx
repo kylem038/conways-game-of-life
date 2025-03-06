@@ -1,5 +1,3 @@
-import { GridState } from '../components/game';
-
 type GridProps = {
     grid: number[][] | undefined;
     handleCellClick: (i: number, k:number) => void;
@@ -7,8 +5,6 @@ type GridProps = {
     cellHeight: number;
     cellWidth: number;
 };
-
-
 
 const Grid: React.FC<GridProps> = ({ grid, handleCellClick, gridWidth, cellHeight, cellWidth }) => {
     return (
