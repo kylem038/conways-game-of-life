@@ -4,6 +4,18 @@ import React, {useRef, useState, useEffect, useCallback} from 'react';
 import { produce } from "immer";
 import Grid from './grid';
 
+// 4 states of cell transformation
+// 1. Cell is dead and will stay dead
+// 2. Cell is alive and will become dead
+// 3. Cell is dead and will become alive
+// 4. Cell is alive and will stay alive
+
+//  Start | End | Outcome
+//  0     | 0   | 0
+//  1     | 0   | 1
+//  0     | 1   | 2
+//  1     | 1   | 3
+
 const Game = () => {
     const rows = 20;
     const cols = 20;
@@ -117,15 +129,25 @@ const Game = () => {
                     for(let i = 0; i < rows; i++) {
                         for(let j = 0; j < cols; j++) {
                             const liveNeighbors = countNeighbors(g, i, j);
-                            // 1. Any live cell with < 2 living neighbors dies
-                            // 3. Any live cell with > 3 live neighbors dies (overpopulation)
-                            if (liveNeighbors < 2 || liveNeighbors > 3) {
-                                gridCopy[i][j] = 0;
-                            // 4. Any dead cell with 3 live neighbors is now alive (repopulation)
-                            } else if (g[i][j] === 0 && liveNeighbors === 3) {
-                                gridCopy[i][j] = 1;
+                            if (g[i][j]) {
+                                if([2,3].includes(liveNeighbors)) {
+                                    gridCopy[i][j] = 3;
+                                }
+                            } else if (liveNeighbors === 3) {
+                                gridCopy[i][j] = 2;
                             }
                             // Rule 2 keeps the base state of the current cell
+                        }
+                    }
+
+                    // See grid at the top of the file for mapping values
+                    for (let i = 0; i < rows; i++) {
+                        for (let j = 0; j < cols; j++) {
+                            if(gridCopy[i][j] === 1) {
+                                gridCopy[i][j] = 0;
+                            } else if ([2,3].includes(gridCopy[i][j])) {
+                                gridCopy[i][j] = 1;
+                            }
                         }
                     }
                 })
