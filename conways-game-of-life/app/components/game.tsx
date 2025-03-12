@@ -5,8 +5,8 @@ import { produce } from "immer";
 import Grid from './grid';
 
 const Game = () => {
-    const rows = 10;
-    const cols = 10;
+    const rows = 20;
+    const cols = 20;
 
     const [grid, setGrid] = useState<number[][]>();
     const [isRunning, setIsRunning] = useState(false);
@@ -77,6 +77,21 @@ const Game = () => {
         setGrid(createGrid());
     }
 
+    const countNeighbors = (g: number[][], i: number, j: number) => {
+        let liveNeighbors = 0;
+        neighbors.forEach(([x,y]) => {
+            const scanRowCell = i + x;
+            const scanColCell = j + y;
+            if(scanRowCell >= 0 && scanRowCell < rows && scanColCell >= 0 && scanColCell < cols) {
+                if([1,3].includes(g[scanRowCell][scanColCell])) {
+                    liveNeighbors += 1;
+                }
+            }
+        });
+
+        return liveNeighbors;
+    }
+
     // Keep the simulate function memoized
     const simulate = useCallback(() => {
         if(!isRunningRef.current) {
@@ -101,17 +116,7 @@ const Game = () => {
                     // 4. Any dead cell with 3 live neighbors is now alive (repopulation)
                     for(let i = 0; i < rows; i++) {
                         for(let j = 0; j < cols; j++) {
-                            let liveNeighbors = 0;
-                            neighbors.forEach(([x, y]) => {
-                                // Get neighbor by row
-                                const newRow = i + x;
-                                // Get neighbor by col
-                                const newCol = j + y;
-                                // Check bounds
-                                if (newRow >= 0 && newRow < rows && newCol >= 0 && newCol < cols) {
-                                    liveNeighbors += g[newRow][newCol];
-                                }
-                            });
+                            const liveNeighbors = countNeighbors(g, i, j);
                             // 1. Any live cell with < 2 living neighbors dies
                             // 3. Any live cell with > 3 live neighbors dies (overpopulation)
                             if (liveNeighbors < 2 || liveNeighbors > 3) {
